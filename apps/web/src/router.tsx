@@ -1,5 +1,5 @@
 import { QueryClientProvider } from "@tanstack/react-query";
-import { createRouter } from "@tanstack/react-router";
+import { createHashHistory, createRouter } from "@tanstack/react-router";
 import type { RouterHistory } from "@tanstack/react-router";
 
 import { Loader } from "#src/components/loader.tsx";
@@ -11,7 +11,8 @@ export const createAppRouter = (history?: RouterHistory) => {
 
   return createRouter({
     routeTree,
-    history,
+    // 用 hash 路由：纯静态托管（不支持 history fallback）也能直接刷新 /plan
+    history: history ?? createHashHistory(),
     context: { queryClient },
     defaultPreload: "intent",
     defaultPreloadStaleTime: 0,
