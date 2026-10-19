@@ -2,6 +2,8 @@
 
 三个人的数据结构学习计划，做成手机网页：总览进度、11 周排期、课设方案、组内约定。
 
+**在线访问**：<https://28703e0a57cd4af0b6b497cc8fc07b7b.sg.agentos-app.run>
+
 内容来自两份转写稿的整理（三人讨论 + 老师第二节课的题目讲解），课程顺序对齐
 [labuladong 的算法笔记](https://labuladong.online/zh/algo/home/)。
 
