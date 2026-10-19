@@ -1,0 +1,35 @@
+{
+  "name": "ds-study-plan",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vp run -r --parallel dev",
+    "build": "vp run -r build",
+    "ready": "vp check && vp run knip && vp test && vp run test:e2e && vp run -r build",
+    "prepare": "vp config",
+    "test:e2e": "vp run --filter @ds-study-plan/web test:e2e",
+    "knip": "knip"
+  },
+  "devDependencies": {
+    "@ds-study-plan/config": "workspace:*",
+    "@shadcn/lint": "catalog:",
+    "@types/node": "catalog:",
+    "knip": "catalog:",
+    "typescript": "catalog:",
+    "ultracite": "catalog:",
+    "vite": "catalog:",
+    "vite-plus": "catalog:"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "12.11.2",
+      "onFail": "warn"
+    }
+  },
+  "engines": {
+    "node": "24.21.0",
+    "pnpm": "12.11.2"
+  }
+}

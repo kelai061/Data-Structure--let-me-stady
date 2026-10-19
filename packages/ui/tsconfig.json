@@ -1,0 +1,4 @@
+{
+  "extends": "@ds-study-plan/config/typescript/react.json",
+  "include": ["src"]
+}

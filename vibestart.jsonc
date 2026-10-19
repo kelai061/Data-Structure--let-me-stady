@@ -1,0 +1,19 @@
+{
+  "$schema": "https://vibestart.net/schema.json",
+
+  "name": "ds-study-plan",
+  "version": "0.1.0-beta.8",
+
+  "stack": {
+    "toolchain": "vite-plus",
+    "frontend": "react",
+    "framework": "spa",
+    "router": "tanstack-router",
+    "ui": "shadcn",
+    "testing": "playwright",
+  },
+
+  "addons": ["knip", "ultracite"],
+
+  "channel": "recommended",
+}
