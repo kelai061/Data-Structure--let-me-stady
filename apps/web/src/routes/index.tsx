@@ -1,5 +1,12 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { ArrowRight, Minus, Plus } from "lucide-react";
+import {
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+  Minus,
+  Plus,
+} from "lucide-react";
+import { useState } from "react";
 
 import { MemberSwitcher } from "#src/components/member-switcher.tsx";
 import { MiniBar } from "#src/components/mini-bar.tsx";
@@ -51,14 +58,32 @@ const OverviewPage = () => {
   const state = useAppState();
   const memberId = state.activeMemberId;
   const currentWeek = weekOfDate(state.startDate);
-  const plan = getWeek(currentWeek);
+  const [selectedWeek, setSelectedWeek] = useState(currentWeek);
+  const plan = getWeek(selectedWeek);
   const stats = memberStats(state, memberId);
   const doneSet = new Set(state.done[memberId]);
-  const weekHours = state.hours[memberId]?.[String(currentWeek)] ?? 0;
+  const weekHours = state.hours[memberId]?.[String(selectedWeek)] ?? 0;
+  const isCurrent = selectedWeek === currentWeek;
 
   const finishedThisWeek = plan.topics.filter((topic) =>
     doneSet.has(topic.id)
   ).length;
+
+  const goWeek = (week: number) => {
+    setSelectedWeek(Math.min(Math.max(week, 1), PLAN.totalWeeks));
+  };
+
+  const weekLabelClass = (week: number, selected: boolean) => {
+    if (selected) {
+      return "text-accent-foreground font-semibold";
+    }
+
+    if (week === currentWeek) {
+      return "text-primary font-semibold";
+    }
+
+    return "text-muted-foreground";
+  };
 
   return (
     <div className="grid gap-4">
@@ -73,11 +98,23 @@ const OverviewPage = () => {
             </span>
           </ProgressRing>
           <div className="min-w-0 flex-1">
-            <p className="text-muted-foreground text-mini">
-              第 {currentWeek}/{PLAN.totalWeeks} 周 · 学期第{" "}
-              {PLAN.termStartWeek + currentWeek - 1} 周 ·{" "}
-              {plan.phase === "tech" ? "技术学习" : "课设"}
-            </p>
+            <div className="flex items-center gap-1.5">
+              <p className="text-muted-foreground text-mini">
+                第 {selectedWeek}/{PLAN.totalWeeks} 周 · 学期第{" "}
+                {PLAN.termStartWeek + selectedWeek - 1} 周
+              </p>
+              {isCurrent ? null : (
+                <button
+                  className="bg-accent text-accent-foreground text-micro shrink-0 cursor-pointer rounded-full px-1.5 py-0.5 font-medium"
+                  onClick={() => {
+                    setSelectedWeek(currentWeek);
+                  }}
+                  type="button"
+                >
+                  回到本周
+                </button>
+              )}
+            </div>
             <p className="mt-1 text-base leading-snug font-semibold text-balance">
               {plan.title}
             </p>
@@ -107,11 +144,37 @@ const OverviewPage = () => {
       </section>
 
       <section className="bg-card ring-foreground/10 rounded-2xl p-4 ring-1">
-        <div className="flex items-baseline justify-between">
-          <h2 className="text-sm font-semibold">本周要做完的</h2>
-          <span className="text-muted-foreground text-mini tabular-nums">
-            {finishedThisWeek}/{plan.topics.length}
-          </span>
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-semibold">
+            {isCurrent ? "本周要做完的" : `第 ${selectedWeek} 周要做完的`}
+          </h2>
+          <div className="flex items-center gap-1">
+            <button
+              aria-label="上一周"
+              className="text-muted-foreground hover:text-foreground cursor-pointer p-0.5 disabled:cursor-not-allowed disabled:opacity-30"
+              disabled={selectedWeek <= 1}
+              onClick={() => {
+                goWeek(selectedWeek - 1);
+              }}
+              type="button"
+            >
+              <ChevronLeft className="size-4" />
+            </button>
+            <span className="text-muted-foreground text-mini tabular-nums">
+              {finishedThisWeek}/{plan.topics.length}
+            </span>
+            <button
+              aria-label="下一周"
+              className="text-muted-foreground hover:text-foreground cursor-pointer p-0.5 disabled:cursor-not-allowed disabled:opacity-30"
+              disabled={selectedWeek >= PLAN.totalWeeks}
+              onClick={() => {
+                goWeek(selectedWeek + 1);
+              }}
+              type="button"
+            >
+              <ChevronRight className="size-4" />
+            </button>
+          </div>
         </div>
         <div className="divide-border mt-1 divide-y">
           {plan.topics.map((topic) => (
@@ -125,7 +188,9 @@ const OverviewPage = () => {
 
         <div className="mt-2 flex items-center justify-between border-t pt-3">
           <div>
-            <p className="text-xs font-medium">本周学时打卡</p>
+            <p className="text-xs font-medium">
+              {isCurrent ? "本周学时打卡" : `第 ${selectedWeek} 周学时打卡`}
+            </p>
             <p className="text-muted-foreground text-mini">
               目标 {plan.hours > 0 ? `${plan.hours}h` : "按课设进度"}，周末一天
               3h × 2 段
@@ -136,7 +201,7 @@ const OverviewPage = () => {
               aria-label="减 1 小时"
               className="border-input hover:bg-muted cursor-pointer rounded-md border p-1.5 transition-colors"
               onClick={() => {
-                setWeekHours(currentWeek, weekHours - 1);
+                setWeekHours(selectedWeek, weekHours - 1);
               }}
               type="button"
             >
@@ -152,7 +217,7 @@ const OverviewPage = () => {
               aria-label="加 1 小时"
               className="border-input hover:bg-muted cursor-pointer rounded-md border p-1.5 transition-colors"
               onClick={() => {
-                setWeekHours(currentWeek, weekHours + 1);
+                setWeekHours(selectedWeek, weekHours + 1);
               }}
               type="button"
             >
@@ -172,7 +237,7 @@ const OverviewPage = () => {
             看全部 <ArrowRight className="size-3" />
           </Link>
         </div>
-        <div className="mt-3 grid grid-cols-11 gap-1">
+        <div className="mt-3 grid grid-cols-11 gap-0.5">
           {WEEKS.map((item) => {
             const total = item.topics.length;
 
@@ -181,20 +246,28 @@ const OverviewPage = () => {
             ).length;
 
             const ratio = total === 0 ? 0 : finished / total;
+            const selected = item.week === selectedWeek;
 
             return (
-              <div className="flex flex-col items-center gap-1" key={item.week}>
+              <button
+                aria-label={`第 ${item.week} 周`}
+                aria-pressed={selected}
+                className={`flex cursor-pointer flex-col items-center gap-1 rounded-md px-0.5 pt-1 pb-0.5 transition-colors ${
+                  selected ? "bg-accent" : "hover:bg-muted"
+                }`}
+                key={item.week}
+                onClick={() => {
+                  setSelectedWeek(item.week);
+                }}
+                type="button"
+              >
                 <MiniBar ratio={ratio} tone={BAR_FILL[item.level]} />
                 <span
-                  className={`text-micro tabular-nums ${
-                    item.week === currentWeek
-                      ? "text-primary font-semibold"
-                      : "text-muted-foreground"
-                  }`}
+                  className={`text-micro tabular-nums ${weekLabelClass(item.week, selected)}`}
                 >
                   {item.week}
                 </span>
-              </div>
+              </button>
             );
           })}
         </div>
@@ -205,7 +278,7 @@ const OverviewPage = () => {
               {LEVEL_META[level].label}
             </span>
           ))}
-          <span className="ml-auto">1–8 周技术 · 9–11 周课设</span>
+          <span className="ml-auto">点周次可切换</span>
         </div>
       </section>
 

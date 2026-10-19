@@ -21,9 +21,9 @@ interface AppState {
 const PREFIX = "ds-plan:v1:";
 
 const DEFAULT_MEMBERS: readonly Member[] = [
-  { id: "m1", name: "我" },
-  { id: "m2", name: "同学 B" },
-  { id: "m3", name: "同学 C" },
+  { id: "m1", name: "kelai" },
+  { id: "m2", name: "曹" },
+  { id: "m3", name: "沈" },
 ];
 
 const DEFAULT_STATE: AppState = {
